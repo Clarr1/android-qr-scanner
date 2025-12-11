@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/material_dynamic_neutral95"
-    tools:context=".AddClass">
+    >
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -26,30 +26,11 @@
             android:padding="20dp">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/section_input_layout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:hint="Year and Section"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/section"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:text="Year and Section" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/subject_name_input_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="Subject Name"
-                app:layout_constraintTop_toBottomOf="@id/section_input_layout"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginBottom="36dp"

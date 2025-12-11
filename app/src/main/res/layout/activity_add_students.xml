@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".AddStudents">
 
+    <include layout="@layout/toolbar"/>
+
     <androidx.cardview.widget.CardView
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -22,6 +24,17 @@
             android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <!-- Subject Title -->
+            <TextView
+                android:id="@+id/subject_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subject Name"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:paddingBottom="12dp"/>
+
 
             <!-- EditText -->
             <EditText
