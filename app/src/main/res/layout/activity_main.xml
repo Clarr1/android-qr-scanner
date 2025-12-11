@@ -7,7 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <include layout="@layout/toolbar"/>
+<!--    <include layout="@layout/toolbar"/>-->
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#fbd78f"
+        app:title="Library"
+        app:titleTextColor="@android:color/white"
+       />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

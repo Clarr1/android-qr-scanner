@@ -6,7 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".AddStudents">
 
-    <include layout="@layout/toolbar"/>
+<!--    <include layout="@layout/toolbar"/>-->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#fbd78f"
+        app:title="Library"
+        app:titleTextColor="@android:color/white"
+        app:menu="@menu/add_students_menu"/>
 
     <androidx.cardview.widget.CardView
         android:layout_width="300dp"
