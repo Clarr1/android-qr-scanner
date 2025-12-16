@@ -1,70 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/material_dynamic_neutral95">
 
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
+        android:id="@+id/add_class_card"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
+        android:layout_marginHorizontal="48dp"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="10dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.3">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:padding="24dp">
 
+            <!-- Title -->
+            <TextView
+                android:id="@+id/subject_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Subject Name"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:paddingBottom="18dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/subject_name_input_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Subject Name"
-                app:layout_constraintTop_toTopOf="parent"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusTopStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusBottomEnd="14dp"
+                app:layout_constraintTop_toBottomOf="@id/subject_title"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginBottom="36dp"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                app:layout_constraintEnd_toEndOf="parent">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/subject_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:text="Subject name" />
+                    android:layout_height="56dp"
+                    android:hint="Enter subject name"
+                    android:textSize="17sp"
+                    android:padding="14dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/cancel_btn"
-                android:layout_width="0dp"
+            <!-- Buttons -->
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancel"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/accept_btn"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:paddingTop="28dp"
                 app:layout_constraintTop_toBottomOf="@id/subject_name_input_layout"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintBaseline_toBaselineOf="@id/accept_btn"
-                android:layout_marginEnd="8dp" />
+                app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/accept_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Accept"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/cancel_btn"
-                app:layout_constraintTop_toBottomOf="@id/subject_name_input_layout"
-                app:layout_constraintHorizontal_weight="1"
-                android:layout_marginStart="8dp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/cancel_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancel"
+                    app:backgroundTint="#ff7d7d" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/accept_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Accept"
+                    app:backgroundTint="#fbd78f" />
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

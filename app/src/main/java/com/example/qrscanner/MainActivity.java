@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recyclerView);
-        btn_scan = findViewById(R.id.btn_scan);
+//        btn_scan = findViewById(R.id.btn_scan);
         FloatingActionButton add_class_btn = findViewById(R.id.add_class_btn);
 
         db = new DatabaseHelper(this);
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         customAdapter = new CustomAdapter(MainActivity.this, subject_name);
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-    }   // ← END OF onCreate()
+    }
 
     void displaySubject() {
         Cursor cursor = db.readAllSubject();

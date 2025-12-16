@@ -7,60 +7,37 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-<!--    <include layout="@layout/toolbar"/>-->
-
     <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#fbd78f"
-        app:title="Library"
+        app:title="SAS"
         app:titleTextColor="@android:color/white"
-       />
+        android:layout_alignParentTop="true"/>
 
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:paddingTop="?attr/actionBarSize"
-        android:layout_width="409dp"
-        android:layout_height="729dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topAppBar"
+        android:padding="12dp"
+        android:clipToPadding="false"/>
 
+    <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_class_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        app:srcCompat="@drawable/outline_add_24"
-        app:backgroundTint="#fbd78f"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
+        android:clickable="true"
+        app:srcCompat="@drawable/outline_add_24"
+        app:backgroundTint="#fbd78f"
         app:tint="#FFFFFF"
-        android:contentDescription="Add new item" />
+        android:contentDescription="Add new item"/>
 
-
-    <Button
-        android:id="@+id/btn_scan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="14dp"
-        android:layout_marginBottom="54dp"
-        android:visibility="invisible"
-        android:text="Scan" />
-
-    <!--    <Button-->
-    <!--        android:id="@+id/add_class_btn"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_centerInParent="true"-->
-    <!--        android:text="Add Class" />-->
 </RelativeLayout>

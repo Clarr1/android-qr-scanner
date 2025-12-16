@@ -40,6 +40,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db); db.setForeignKeyConstraintsEnabled(true);
+    }
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
 
         // STUDENT TABLE
@@ -82,9 +87,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    // ---------------------------
     // INSERT STUDENTS
-    // ---------------------------
+
     void addStudents(String student_number, String student_full_name, String student_section) {
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -104,9 +108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    // ---------------------------
     // MULTI-LINE IMPORT
-    // ---------------------------
     void addStudentFromLine(String line) {
 
         String[] parts = line.split(",");
@@ -133,10 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-
-    // ---------------------------
     // SUBJECTS
-    // ---------------------------
     void addSubject(String subject_name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -160,6 +159,104 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return db.rawQuery(query, null);
         }
         return null;
+    }
+
+    private int getStudentIdByNumber(String studentNumber) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT " + STUDENT_ID +
+                        " FROM " + STUDENT_TABLE +
+                        " WHERE " + STUDENT_NUMBER + " = ?",
+                new String[]{studentNumber}
+        );
+
+        int studentId = -1;
+
+        if (cursor.moveToFirst()) {
+            studentId = cursor.getInt(0);
+        }
+
+        cursor.close();
+        return studentId;
+    }
+
+    void scanAttendance(String studentNumber, int subjectId) {
+
+        int studentId = getStudentIdByNumber(studentNumber);
+
+        if (studentId == -1) {
+            Toast.makeText(context, "Student not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String today = getCurrentDate();
+
+        if (alreadyScanned(studentId, subjectId, today)) {
+            Toast.makeText(context, "Already scanned today", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(STUDENT_ID, studentId);
+        cv.put(SUBJECT_ID, subjectId);
+        cv.put(DATE, today);
+        cv.put(TIME, getCurrentTime());
+        cv.put(STATUS, "Present");
+
+        long result = db.insert(ATTENDACE_TABLE, null, cv);
+
+        if (result == -1) {
+            Toast.makeText(context, "Attendance failed", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Attendance recorded", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private boolean alreadyScanned(int studentId, int subjectId, String date) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM " + ATTENDACE_TABLE +
+                        " WHERE " + STUDENT_ID + "=? AND " +
+                        SUBJECT_ID + "=? AND " +
+                        DATE + "=?",
+                new String[]{String.valueOf(studentId), String.valueOf(subjectId), date}
+        );
+
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
+
+    private String getCurrentDate() {
+        return new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                .format(new java.util.Date());
+    }
+
+    private String getCurrentTime() {
+        return new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                .format(new java.util.Date());
+    }
+
+    int getSubjectIdByName(String subjectName) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT subject_id FROM subject_table WHERE subject_name = ?",
+                new String[]{subjectName}
+        );
+
+        int subjectId = -1;
+        if (cursor.moveToFirst()) {
+            subjectId = cursor.getInt(0);
+        }
+
+        cursor.close();
+        return subjectId;
     }
 
 

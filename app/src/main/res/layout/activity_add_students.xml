@@ -6,79 +6,33 @@
     android:layout_height="match_parent"
     tools:context=".AddStudents">
 
-<!--    <include layout="@layout/toolbar"/>-->
+    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#fbd78f"
-        app:title="Library"
+        app:title="Attendance"
         app:titleTextColor="@android:color/white"
-        app:menu="@menu/add_students_menu"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="300dp"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/scan_id"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:contentDescription="Scan"
+
+        app:backgroundTint="#fbd78f"
+        app:srcCompat="@drawable/baseline_qr_code_scanner"
+        app:tint="#FFFFFF"
+
+        app:fabSize="normal"
+        app:maxImageSize="32dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Container inside CardView -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- Subject Title -->
-            <TextView
-                android:id="@+id/subject_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Subject Name"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:paddingBottom="12dp"/>
-
-
-            <!-- EditText -->
-            <EditText
-                android:id="@+id/add_student_text_box"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:gravity="top|start"
-                android:background="@android:color/transparent"
-                android:hint="Enter text here..."
-                android:textSize="18sp" />
-
-            <!-- Buttons row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="end"
-                android:paddingTop="20dp">
-
-                <Button
-                    android:id="@+id/cancel_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Cancel" />
-
-                <Button
-                    android:id="@+id/add_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add"
-                    android:layout_marginStart="12dp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
