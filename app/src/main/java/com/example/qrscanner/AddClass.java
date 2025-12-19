@@ -1,5 +1,8 @@
+
+
 package com.example.qrscanner;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,19 +32,30 @@ public class AddClass extends AppCompatActivity {
         accept_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseHelper db =  new DatabaseHelper(AddClass.this);
-                db.addSubject(add_class_input.getText().toString().trim());
-            }
+                String newSubject = add_class_input.getText().toString().trim();
+                if (!newSubject.isEmpty()) {
 
+                    // Add to database
+                    DatabaseHelper db = new DatabaseHelper(AddClass.this);
+                    db.addSubject(newSubject);
+
+                    // Return the new subject to the previous activity
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("newSubject", newSubject);
+                    setResult(RESULT_OK, resultIntent);
+
+                    finish(); // close AddClass activity
+                }
+            }
         });
 
         cancel_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 finish(); // close activity
             }
         });
-
 
     }
 }

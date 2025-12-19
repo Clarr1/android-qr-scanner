@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,10 +19,18 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
     private Context context;
     private ArrayList<String> subject_name;
+    private OnSubjectActionListener listener;
 
-    CustomAdapter(Context context, ArrayList<String> subject_name){
+    CustomAdapter(Context context, ArrayList<String> subject_name,
+                  OnSubjectActionListener listener) {
         this.context = context;
         this.subject_name = subject_name;
+        this.listener = listener;
+    }
+
+    public interface OnSubjectActionListener {
+        void onEdit(String subject);
+        void onDelete(String subject);
     }
 
     @NonNull
@@ -34,16 +43,38 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.subject_name.setText(subject_name.get(position));
-        holder.mainLayout.setOnClickListener(new
-                View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, AddStudents.class);
-                        intent.putExtra("subject_name", subject_name.get(position));
-                        context.startActivity(intent);
-                    }
-                });
+
+        String subject = subject_name.get(position);
+        holder.subject_name.setText(subject);
+
+        // NORMAL CLICK → OPEN STUDENTS
+        holder.mainLayout.setOnClickListener(v -> {
+            Intent intent = new Intent(context, AddStudents.class);
+            intent.putExtra("subject_name", subject);
+            context.startActivity(intent);
+        });
+
+        // LONG CLICK → EDIT / DELETE MENU
+        holder.mainLayout.setOnLongClickListener(v -> {
+
+            PopupMenu popupMenu = new PopupMenu(context, v);
+            popupMenu.inflate(R.menu.subjects_menu);
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.add_students_edit) {
+                    listener.onEdit(subject);
+                    return true;
+
+                } else if (item.getItemId() == R.id.add_students_delete) {
+                    listener.onDelete(subject);
+                    return true;
+                }
+                return false;
+            });
+
+            popupMenu.show();
+            return true;
+        });
     }
 
     @Override
@@ -61,4 +92,5 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             mainLayout = itemView.findViewById(R.id.mainLayout);
         }
     }
+
 }
