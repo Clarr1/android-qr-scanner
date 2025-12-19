@@ -6,4 +6,22 @@
     </style>
 
     <style name="Theme.QRScanner" parent="Base.Theme.QRScanner" />
+
+    <style name="Theme.QRScanner.Popup" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Transparent background -->
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <!-- Dim background -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
+
+        <!-- Popup behavior -->
+        <item name="android:windowCloseOnTouchOutside">true</item>
+    </style>
+
+    <style name="PopupAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/popup_fade_out</item>
+    </style>
 </resources>

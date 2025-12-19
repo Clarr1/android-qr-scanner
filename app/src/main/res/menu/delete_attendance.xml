@@ -2,15 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/add_students_menu"
-        android:title="Add student"
-        app:showAsAction="never"
-        />
 
     <item
-        android:id="@+id/export_attendance"
-        android:title="Export attendance"
+        android:id="@+id/attendance_delete"
+        android:title="Delete"
         app:showAsAction="never"
         />
 

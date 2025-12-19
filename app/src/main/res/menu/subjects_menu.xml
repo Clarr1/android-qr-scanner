@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/add_students_menu"
-        android:title="Add student"
+        android:id="@+id/add_students_edit"
+        android:title="Edit"
         app:showAsAction="never"
         />
 
     <item
-        android:id="@+id/export_attendance"
-        android:title="Export attendance"
+        android:id="@+id/add_students_delete"
+        android:title="Delete"
         app:showAsAction="never"
         />
 

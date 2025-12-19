@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#fbd78f"
-        app:title="SAS"
+        app:title="Classes"
         app:titleTextColor="@android:color/white"
         android:layout_alignParentTop="true"/>
 
@@ -25,6 +25,27 @@
         android:layout_below="@id/topAppBar"
         android:padding="12dp"
         android:clipToPadding="false"/>
+
+    <ImageView
+        android:id="@+id/empty_imageview"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        android:layout_marginTop="230dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:src="@drawable/class_icon" />
+
+    <TextView
+        android:id="@+id/no_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/empty_imageview"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="No class"
+        android:visibility="gone"
+        android:textSize="20sp"
+     />
 
     <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
