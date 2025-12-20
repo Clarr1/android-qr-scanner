@@ -2,6 +2,7 @@
 package com.example.qrscanner;import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,9 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +51,11 @@ public class AddStudents extends AppCompatActivity {
     StudentAdapter adapter;
     ArrayList<Student> presentStudents;
 
+    ImageView empty_attendance;
+    TextView no_attendance;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +63,15 @@ public class AddStudents extends AppCompatActivity {
 
         subjectName = getIntent().getStringExtra("subject_name");
 
+        empty_attendance = findViewById(R.id.empty_attendance);
+        no_attendance = findViewById(R.id.no_attendance);
+
         MaterialToolbar toolbar = findViewById(R.id.topAppBar);
         setSupportActionBar(toolbar);
+
+        // back button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.outline_arrow_back_24);
 
         recyclerView = findViewById(R.id.studentRecyclerView);
 
@@ -94,6 +110,7 @@ public class AddStudents extends AppCompatActivity {
                     presentStudents.remove(position);
                     adapter.notifyItemRemoved(position);
                     showCustomToast("Attendance deleted");
+                    updateEmptyState();
                 }
                 dialog.dismiss();
             });
@@ -129,6 +146,12 @@ public class AddStudents extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        if (item.getItemId() == android.R.id.home) {
+            // Go back to previous activity
+            onBackPressed();
+            return true;
+        }
+
         if (item.getItemId() == R.id.add_students_menu) {
             showFormPopup(subjectName);
             return true;
@@ -152,7 +175,7 @@ public class AddStudents extends AppCompatActivity {
         View popupView = getLayoutInflater().inflate(R.layout.form_add_students, null);
         View rootView = findViewById(android.R.id.content);
 
-        // BLUR BACKGROUND
+        // BLUR / DIM BACKGROUND
         View dimView = new View(this);
         dimView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -161,33 +184,56 @@ public class AddStudents extends AppCompatActivity {
         dimView.setBackgroundColor(0x99000000); // dim effect
         ((ViewGroup) rootView).addView(dimView);
 
-        // POPUP
+        // WRAP POPUP IN SCROLLVIEW TO HANDLE KEYBOARD
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.setFillViewport(true);
+        scrollView.addView(popupView);
+
+        // POPUPWINDOW
         PopupWindow popupWindow = new PopupWindow(
-                popupView,
+                scrollView,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 true
         );
 
+        // KEYBOARD ADJUSTMENT
+        popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        // ELEVATION & SHOW
         popupWindow.setElevation(24f);
         popupWindow.showAtLocation(rootView, Gravity.CENTER, 0, 0);
 
-        popupWindow.setOnDismissListener(() ->
-                ((ViewGroup) rootView).removeView(dimView)
-        );
+        popupWindow.setOnDismissListener(() -> ((ViewGroup) rootView).removeView(dimView));
 
         // POPUP ELEMENTS
         TextView subjectTitle = popupView.findViewById(R.id.subject_title);
         EditText studentBox = popupView.findViewById(R.id.add_student_text_box);
-        Button addBtn = popupView.findViewById(R.id.add_btn);
-        Button cancelBtn = popupView.findViewById(R.id.cancel_btn);
 
         subjectTitle.setText(subjectName);
+
+//         Example placeholder text
+        String exampleText = "243453521,John Doe,BSIT3O\n" +
+                "23151100,Juan Gomez,BSIT3A\n" +
+                "23151101,Ana Santos,BSIT3B";
+
+        studentBox.setText(exampleText);
+        studentBox.setTextColor(Color.GRAY);
+
+        studentBox.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && studentBox.getCurrentTextColor() == Color.GRAY) {
+                studentBox.setText("");
+                studentBox.setTextColor(Color.BLACK);
+            }
+        });
+
+        // BUTTONS
+        Button addBtn = popupView.findViewById(R.id.add_btn);
+        Button cancelBtn = popupView.findViewById(R.id.cancel_btn);
 
         cancelBtn.setOnClickListener(v -> popupWindow.dismiss());
 
         addBtn.setOnClickListener(v -> {
-
             int subjectId = db.getSubjectIdByName(subjectName);
             if (subjectId == -1) {
                 showCustomToast("Subject not found");
@@ -195,15 +241,23 @@ public class AddStudents extends AppCompatActivity {
             }
 
             String input = studentBox.getText().toString().trim();
-            if (input.isEmpty()) return;
+            if (input.isEmpty() || studentBox.getCurrentTextColor() == Color.GRAY) {
+                showCustomToast("Please enter student data");
+                return;
+            }
 
             String[] lines = input.split("\n");
+
+            boolean allSuccess = true;
 
             for (String line : lines) {
                 if (line.trim().isEmpty()) continue;
 
-                // Format: studentNumber, fullName, section
-                db.addStudentFromLine(line);
+                boolean success = db.addStudentFromLine(line);
+                if (!success) {
+                    allSuccess = false;
+                    continue; // skip enrollment for invalid line
+                }
 
                 String studentNumber = line.split(",")[0].trim();
                 Student student = db.getStudentByNumber(studentNumber);
@@ -213,11 +267,19 @@ public class AddStudents extends AppCompatActivity {
                 }
             }
 
-         showCustomToast("Student added and enrolled");
+// Show toast after processing all lines
+            if (allSuccess) {
+                showCustomToast("All students added and enrolled");
+            } else {
+                showCustomToast("Some lines were invalid");
+            }
+
+            popupWindow.dismiss();
+
             popupWindow.dismiss();
         });
-
     }
+
 
 
 //scan
@@ -237,33 +299,27 @@ public class AddStudents extends AppCompatActivity {
                 if (result.getContents() == null) return;
 
                 String studentNumber = result.getContents().trim();
-
                 int subjectId = db.getSubjectIdByName(subjectName);
+
                 if (subjectId == -1) {
-                   showCustomToast("Subject not found");
+                    showCustomToast("Subject not found");
                     return;
                 }
 
-                //  GET STUDENT
                 Student student = db.getStudentByNumber(studentNumber);
-
-                //  NULL CHECK (CRITICAL)
                 if (student == null) {
                     showCustomToast("Student not registered");
                     return;
                 }
 
-                int studentId = student.getId();
-
-                //  SUBJECT ENROLLMENT CHECK
-                if (!db.isStudentInSubject(studentId, subjectId)) {
+                if (!db.isStudentInSubject(student.getId(), subjectId)) {
                     showCustomToast("Student is not enrolled in this subject");
                     return;
                 }
+
+                // ROOT VIEW & DIM BACKGROUND
                 View rootView = findViewById(android.R.id.content);
                 View popupView = getLayoutInflater().inflate(R.layout.popup_student_found, null);
-
-// Dim background
                 View dimView = new View(this);
                 dimView.setLayoutParams(new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -272,7 +328,7 @@ public class AddStudents extends AppCompatActivity {
                 dimView.setBackgroundColor(0x99000000);
                 ((ViewGroup) rootView).addView(dimView);
 
-// Popup
+                // POPUP WINDOW
                 PopupWindow popupWindow = new PopupWindow(
                         popupView,
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -280,48 +336,53 @@ public class AddStudents extends AppCompatActivity {
                         true
                 );
                 popupWindow.setElevation(24f);
+                popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                 popupWindow.showAtLocation(rootView, Gravity.CENTER, 0, 0);
+                popupWindow.setOnDismissListener(() -> ((ViewGroup) rootView).removeView(dimView));
 
-                popupWindow.setOnDismissListener(() ->
-                        ((ViewGroup) rootView).removeView(dimView)
-                );
-
-// Views
+                // POPUP ELEMENTS
                 TextView info = popupView.findViewById(R.id.student_info);
                 MaterialButton btnCancel = popupView.findViewById(R.id.btn_cancel);
                 MaterialButton btnMarkPresent = popupView.findViewById(R.id.btn_mark_present);
 
-// Set content
-                info.setText(
-                        "Name: " + student.getName() + "\n" +
-                                "Student No: " + student.getStudentNumber()
-                );
+                info.setText("Name: " + student.getName() + "\n" +
+                        "Student No: " + student.getStudentNumber());
 
-// Actions
                 btnCancel.setOnClickListener(v -> popupWindow.dismiss());
 
                 btnMarkPresent.setOnClickListener(v -> {
 
-                    DatabaseHelper.ScanResult scanResult =
-                            db.scanAttendance(student.getStudentNumber(), subjectId);
+                    // MARK ATTENDANCE
+                    DatabaseHelper.ScanResult scanResult = db.scanAttendance(student.getStudentNumber(), subjectId);
 
                     switch (scanResult) {
                         case SUCCESS:
-                            // Get the updated student with time from DB
+                            // Fetch updated student
                             Student updatedStudent = db.getStudentByNumber(student.getStudentNumber());
 
-                            // For attendance today, get the time from attendance table
-                            ArrayList<Student> tempList = db.getPresentStudents(subjectId);
-                            for (Student s : tempList) {
-                                if (s.getId() == student.getId()) {
-                                    updatedStudent = s;
+                            // Update RecyclerView immediately
+                            int index = -1;
+                            for (int i = 0; i < presentStudents.size(); i++) {
+                                if (presentStudents.get(i).getStudentNumber()
+                                        .equals(updatedStudent.getStudentNumber())) {
+                                    index = i;
                                     break;
                                 }
                             }
 
-                            presentStudents.add(updatedStudent);
-                            adapter.notifyItemInserted(presentStudents.size() - 1);
+                            if (index != -1) {
+                                presentStudents.set(index, updatedStudent);
+                                adapter.notifyItemChanged(index);
+                            } else {
+                                presentStudents.add(updatedStudent);
+                                adapter.notifyItemInserted(presentStudents.size() - 1);
+                            }
+
+                            updateEmptyState();
                             showCustomToast("Attendance marked");
+
+                            // Optional: reload from DB to ensure full sync (includes any other changes)
+                            loadAttendance();
                             break;
 
                         case ALREADY_SCANNED:
@@ -334,7 +395,6 @@ public class AddStudents extends AppCompatActivity {
 
                     popupWindow.dismiss();
                 });
-
             });
 
     private void showCustomToast(String message) {
@@ -352,16 +412,35 @@ public class AddStudents extends AppCompatActivity {
     }
 
     private void loadAttendance() {
-        int subjectId = db.getSubjectIdByName(subjectName);
+        new Thread(() -> {
+            int subjectId = db.getSubjectIdByName(subjectName);
 
-        if (subjectId == -1) return;
+            ArrayList<Student> tempList = new ArrayList<>();
+            if (subjectId != -1) {
+                tempList.addAll(db.getPresentStudents(subjectId));
+            }
 
-        presentStudents.clear();
-        presentStudents.addAll(db.getPresentStudents(subjectId));
-        adapter.notifyDataSetChanged();
+            runOnUiThread(() -> {
+                presentStudents.clear();
+                presentStudents.addAll(tempList);
+                adapter.notifyDataSetChanged();
+
+                boolean isEmpty = tempList.isEmpty() || subjectId == -1;
+                if (empty_attendance != null) empty_attendance.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+                if (no_attendance != null) no_attendance.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+            });
+        }).start();
     }
 
+
+
     private void exportAttendanceToDownloads(int subjectId) {
+        // Check if there is attendance today
+        int count = db.getAttendanceCountForToday(subjectId);
+        if (count == 0) {
+            showCustomToast("No attendance records to export");
+            return;
+        }
 
         String fileName = "Attendance_" + subjectName + "_" +
                 new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date()) + ".csv";
@@ -406,7 +485,7 @@ public class AddStudents extends AppCompatActivity {
                         new String[]{String.valueOf(subjectId), today}
                 );
 
-                // Optionally update your RecyclerView
+                // Update RecyclerView
                 presentStudents.clear();
                 adapter.notifyDataSetChanged();
 
@@ -415,16 +494,23 @@ public class AddStudents extends AppCompatActivity {
                 intent.setDataAndType(uri, "text/csv");
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(Intent.createChooser(intent, "Open CSV with"));
-
-    } else {
-               showCustomToast("Export failed");
+            } else {
+                showCustomToast("Export failed");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-           showCustomToast("Error writing file");
+            showCustomToast("Error writing file");
         }
     }
+
+
+    private void updateEmptyState() {
+        boolean isEmpty = presentStudents.isEmpty();
+        if (empty_attendance != null) empty_attendance.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        if (no_attendance != null) no_attendance.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+    }
+
 
 
 }

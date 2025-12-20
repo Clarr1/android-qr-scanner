@@ -115,7 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // STUDENT METHODS
 
-    public void addStudents(String student_number, String student_full_name, String student_section) {
+    public boolean addStudents(String student_number, String student_full_name, String student_section) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -125,18 +125,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.insert(STUDENT_TABLE, null, cv);
 
-        if (result == -1) {
-            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context, "Added successfully", Toast.LENGTH_SHORT).show();
-        }
+        return result != -1; // true = success, false = failed
     }
 
-    public void addStudentFromLine(String line) {
+    public boolean addStudentFromLine(String line) {
         String[] parts = line.split(",");
         if (parts.length != 3) {
-            Toast.makeText(context, "Invalid format", Toast.LENGTH_SHORT).show();
-            return;
+//            Toast.makeText(context, "Invalid format", Toast.LENGTH_SHORT).show();
+            return false;
         }
 
         String number = parts[0].trim();
@@ -144,6 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String section = parts[2].trim();
 
         addStudents(number, name, section);
+        return true;
     }
 
     public void addMultipleStudents(String inputText) {
@@ -158,17 +155,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // SUBJECT METHODS
     // =======================
 
-    public void addSubject(String subject_name) {
+    public boolean addSubject(String subject_name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(SUBJECT_NAME, subject_name);
 
         long result = db.insert(SUBJECT_TABLE, null, cv);
-        if (result == -1) {
-            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context, "Added successfully", Toast.LENGTH_SHORT).show();
-        }
+        return result != -1;
     }
 
     public Cursor readAllSubject() {
@@ -399,11 +392,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean exportAttendanceToCSV(int subjectId, OutputStream os) {
+        Cursor cursor = null;
         try {
+            cursor = getAttendanceCursor(subjectId);
+            if (cursor.getCount() == 0) {
+                return false; // No data to export
+            }
+
             OutputStreamWriter writer = new OutputStreamWriter(os);
             writer.write("Student No,Name,Time\n");
 
-            Cursor cursor = getAttendanceCursor(subjectId);
             while (cursor.moveToNext()) {
                 writer.write(
                         cursor.getString(0) + "," +
@@ -412,7 +410,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 );
             }
 
-            cursor.close();
             writer.flush();
             writer.close();
             return true;
@@ -420,8 +417,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            if (cursor != null) cursor.close();
         }
     }
+
 
 
     public Cursor getAttendanceCursor(int subjectId) {
@@ -435,6 +435,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         " ORDER BY a." + TIME + " ASC",
                 new String[]{String.valueOf(subjectId)}
         );
+    }
+
+    public int getAttendanceCountForToday(int subjectId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM " + ATTENDACE_TABLE +
+                        " WHERE " + SUBJECT_ID + "=? AND " + DATE + "=?",
+                new String[]{String.valueOf(subjectId), today}
+        );
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
     }
 
 }

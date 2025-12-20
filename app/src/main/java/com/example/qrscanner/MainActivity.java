@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     ArrayList<String> subject_name;
     CustomAdapter customAdapter;
+    ImageView empty_imageview;
+    TextView no_subject;
 
     private ActivityResultLauncher<Intent> addClassLauncher =
             registerForActivityResult(
@@ -42,11 +46,15 @@ public class MainActivity extends AppCompatActivity {
                     result -> {
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
 
-                            String newSubject = result.getData().getStringExtra("newSubject");
+                            String newSubject =
+                                    result.getData().getStringExtra("newSubject");
 
-                            if (newSubject != null) {
+                            if (newSubject != null && !newSubject.isEmpty()) {
                                 subject_name.add(newSubject);
                                 customAdapter.notifyItemInserted(subject_name.size() - 1);
+                                showCustomToast("Subject added");
+                            } else {
+                                showCustomToast("Failed to add subject");
                             }
                         }
                     }
@@ -58,23 +66,15 @@ public class MainActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
         recyclerView = findViewById(R.id.recyclerView);
-//        btn_scan = findViewById(R.id.btn_scan);
+        empty_imageview = findViewById(R.id.empty_imageview);
+        no_subject = findViewById(R.id.no_subject);
         FloatingActionButton add_class_btn = findViewById(R.id.add_class_btn);
 
-        db = new DatabaseHelper(this);
-
         subject_name = new ArrayList<>();
-
-        add_class_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddClass.class);
-                addClassLauncher.launch(intent);
-            }
-        });
-
-        displaySubject();
+        db = new DatabaseHelper(this);
 
         customAdapter = new CustomAdapter(
                 MainActivity.this,
@@ -91,8 +91,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(customAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+
+        add_class_btn.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, AddClass.class);
+            addClassLauncher.launch(intent);
+        });
+
+        displaySubject();
     }   // ← END OF onCreate()
 
     private void editSubject(String oldSubjectName) {
@@ -206,14 +214,23 @@ public class MainActivity extends AppCompatActivity {
         subject_name.clear();
 
         Cursor cursor = db.readAllSubject();
+        if (cursor == null) return;
+
         if (cursor.getCount() == 0) {
-            showCustomToast("No classes");
+            if (empty_imageview != null) empty_imageview.setVisibility(View.VISIBLE);
+            if (no_subject != null) no_subject.setVisibility(View.VISIBLE);
         } else {
             while (cursor.moveToNext()) {
                 subject_name.add(cursor.getString(1));
             }
+            if (empty_imageview != null) empty_imageview.setVisibility(View.GONE);
+            if (no_subject != null) no_subject.setVisibility(View.GONE);
         }
+
+        cursor.close(); //
     }
+
+
 
 
 

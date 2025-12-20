@@ -29,7 +29,11 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:hintTextColor="@color/black"
+            android:hint="Add students"
             app:boxBackgroundMode="outline"
+            app:boxStrokeColor="@color/black"
+            app:boxStrokeWidthFocused="0.5dp"
             app:boxCornerRadiusTopStart="14dp"
             app:boxCornerRadiusTopEnd="14dp"
             app:boxCornerRadiusBottomStart="14dp"
@@ -38,13 +42,16 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/add_student_text_box"
                 android:layout_width="match_parent"
-                app:boxBackgroundMode="filled"
                 android:layout_height="180dp"
                 android:gravity="top|start"
-                android:hint="Add students"
-                android:textSize="17sp"
-                android:padding="14dp"/>
+                android:textSize="15sp"
+                android:padding="14dp"
+                android:inputType="textMultiLine"
+                android:scrollHorizontally="false"
+                android:lines="6"
+                android:ellipsize="none"/>
         </com.google.android.material.textfield.TextInputLayout>
+
 
         <!-- Buttons -->
         <LinearLayout
